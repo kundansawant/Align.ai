@@ -1,0 +1,31 @@
+# Sensitive files containing keys
+.env
+backend/.env
+
+# Node.js dependencies
+node_modules/
+
+# Python Virtual Environments
+venv/
+backend/venv/
+
+# Build and compilation output
+out/
+dist/
+build/
+*.vsix
+
+# Python cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# VS Code temporary/debug assets
+.vscode-test/
+*.log

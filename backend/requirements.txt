@@ -1,0 +1,5 @@
+cognee
+fastapi
+uvicorn
+pydantic
+python-dotenv

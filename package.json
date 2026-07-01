@@ -1,0 +1,67 @@
+{
+  "name": "align-ai",
+  "displayName": "Align.ai - UI Design & Codebase Naming Guard",
+  "description": "Ensure strict UI design alignment (resolutions, padding, minimalist guidelines) and naming conventions using Cognee's graph-vector memory.",
+  "version": "1.0.0",
+  "publisher": "wemakedevs-hackathon",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Linters",
+    "Formatters",
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "align-ai-sidebar-container",
+          "title": "Align.ai",
+          "icon": "$(eye)"
+        }
+      ]
+    },
+    "views": {
+      "align-ai-sidebar-container": [
+        {
+          "type": "webview",
+          "id": "align-ai.sidebar",
+          "name": "Design & Naming Guardrails"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "align-ai.syncCurrentFile",
+        "title": "Align.ai: Sync Active File to Memory",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "align-ai.recallGuardrails",
+        "title": "Align.ai: Recall Guardrails",
+        "icon": "$(bell)"
+      },
+      {
+        "command": "align-ai.pruneNodes",
+        "title": "Align.ai: Prune Memory Graph",
+        "icon": "$(trash)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/node": "^16.11.7",
+    "typescript": "^4.9.5"
+  }
+}
