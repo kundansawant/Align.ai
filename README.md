@@ -159,4 +159,4 @@ To ensure a **1-click onboarding experience** for evaluators and hackathon judge
 ## 🤖 AI Disclosure Notice
 
 > [!NOTE]
-> This project was developed for the WeMakeDevs hackathon. Auxiliary code generation, styling transitions, and documentation formatting were assisted and optimized using **Antigravity IDE** and LLM-assisted coding subagents.
+> This project was developed for the WeMakeDevs hackathon. Auxiliary code generation, styling transitions, and documentation formatting.
