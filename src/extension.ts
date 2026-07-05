@@ -223,8 +223,8 @@ async function updateCursorRules(payload: string) {
     const startMarker = '### ALIGN.AI DESIGN GUARDRAILS (AUTO-GENERATED) ###';
     const endMarker = '### END ALIGN.AI DESIGN GUARDRAILS ###';
 
-    // Directive explicitly informing any AI Coding Agent about Align.ai context
-    const directive = `\n# ==========================================\n# ALIGN.AI SYSTEM INSTRUCTIONS\n# You are an AI pair-programmer working on this codebase.\n# This project is guarded by Align.ai using Cognee Memory Graph.\n# You MUST strictly adhere to the following design system rules,\n# formatting styles, and naming conventions.\n# ==========================================\n\n`;
+    // Directive explicitly informing any AI Coding Agent about Align.ai context and preventing codebase scans
+    const directive = `\n# ==========================================\n# ALIGN.AI SYSTEM INSTRUCTIONS\n# You are an AI pair-programmer working on this codebase.\n# This project is guarded by Align.ai using Cognee Memory Graph.\n# \n# IMPORTANT RULES TO PREVENT TOKEN WASTAGE & HALLUCINATION:\n# 1. When asked to "explain the project", "explain codebase", or describe architecture:\n#    - Do NOT run bulk grep searches, scan directories, or read random files.\n#    - Rely strictly on the Cognee context provided in this .cursorrules block.\n# 2. You MUST strictly adhere to the design system rules, layouts, and naming conventions listed below.\n# ==========================================\n\n`;
 
     const newSection = `${startMarker}${directive}${payload}\n${endMarker}`;
 
