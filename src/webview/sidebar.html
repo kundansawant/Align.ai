@@ -393,6 +393,10 @@
                 Sync Active File
             </button>
 
+            <button class="btn btn-ghost" id="btnSyncWorkspace">
+                Sync Entire Workspace
+            </button>
+
             <div class="field-group">
                 <label for="queryType">Query Type</label>
                 <select id="queryType">
@@ -439,6 +443,7 @@
         const queryType = document.getElementById('queryType');
         
         const btnSync = document.getElementById('btnSync');
+        const btnSyncWorkspace = document.getElementById('btnSyncWorkspace');
         const btnRecall = document.getElementById('btnRecall');
         const btnPrune = document.getElementById('btnPrune');
         const btnHideOutput = document.getElementById('btnHideOutput');
@@ -453,6 +458,10 @@
         // Event listeners
         btnSync.addEventListener('click', () => {
             vscode.postMessage({ command: 'syncActive' });
+        });
+
+        btnSyncWorkspace.addEventListener('click', () => {
+            vscode.postMessage({ command: 'syncWorkspace' });
         });
 
         btnRecall.addEventListener('click', () => {

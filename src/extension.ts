@@ -30,6 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('align-ai.syncCurrentFile', async () => {
             await syncCurrentFileToMemory();
         }),
+        vscode.commands.registerCommand('align-ai.syncWorkspace', async () => {
+            await syncEntireWorkspace();
+        }),
         vscode.commands.registerCommand('align-ai.recallGuardrails', async () => {
             const query = await vscode.window.showInputBox({
                 prompt: 'Enter component or style keyword to query design memory',
@@ -74,6 +77,27 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }
     });
+
+    // Auto-recall on startup to push rules forcefully into .cursorrules
+    setTimeout(async () => {
+        try {
+            console.log('Align.ai: Running startup auto-recall...');
+            const response = await fetch(`${BACKEND_URL}/recall`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query_prompt: 'general codebase layout and architectural rules',
+                    dataset_name: 'main_dataset'
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                await updateCursorRules(data.prompt_payload);
+            }
+        } catch (err) {
+            console.error('Align.ai startup auto-recall failed:', err);
+        }
+    }, 2000);
 }
 
 export function deactivate() {}
@@ -198,7 +222,11 @@ async function updateCursorRules(payload: string) {
 
     const startMarker = '### ALIGN.AI DESIGN GUARDRAILS (AUTO-GENERATED) ###';
     const endMarker = '### END ALIGN.AI DESIGN GUARDRAILS ###';
-    const newSection = `${startMarker}\n${payload}\n${endMarker}`;
+
+    // Directive explicitly informing any AI Coding Agent about Align.ai context
+    const directive = `\n# ==========================================\n# ALIGN.AI SYSTEM INSTRUCTIONS\n# You are an AI pair-programmer working on this codebase.\n# This project is guarded by Align.ai using Cognee Memory Graph.\n# You MUST strictly adhere to the following design system rules,\n# formatting styles, and naming conventions.\n# ==========================================\n\n`;
+
+    const newSection = `${startMarker}${directive}${payload}\n${endMarker}`;
 
     let newContent = '';
     if (currentContent.includes(startMarker) && currentContent.includes(endMarker)) {
@@ -215,6 +243,102 @@ async function updateCursorRules(payload: string) {
     } catch (err: any) {
         console.error('Align.ai failed to write .cursorrules:', err);
     }
+}
+
+async function syncEntireWorkspace() {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        vscode.window.showErrorMessage('Align.ai: No open workspace folder found to sync.');
+        return;
+    }
+
+    if (activeProvider && activeProvider.view) {
+        activeProvider.sendStateUpdate('Syncing Workspace...', 'syncing');
+    }
+
+    // Scan for all code/style/config files in the workspace (excluding node_modules, git, out, dist, venv, pycache)
+    const files = await vscode.workspace.findFiles(
+        '**/*.{tsx,jsx,css,ts,js,json,py}',
+        '{**/node_modules/**,**/.git/**,**/out/**,**/dist/**,**/venv/**,**/__pycache__/**}'
+    );
+
+    if (files.length === 0) {
+        vscode.window.showInformationMessage('Align.ai: No supported files found in the workspace.');
+        if (activeProvider && activeProvider.view) {
+            activeProvider.sendStateUpdate('Synced with Cognee Graph', 'synced');
+        }
+        return;
+    }
+
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Align.ai: Syncing Entire Workspace to Cognee Cloud",
+        cancellable: true
+    }, async (progress, token) => {
+        let currentCount = 0;
+        const totalCount = files.length;
+        
+        for (const fileUri of files) {
+            if (token.isCancellationRequested) {
+                vscode.window.showWarningMessage('Align.ai: Workspace sync cancelled.');
+                break;
+            }
+            
+            try {
+                const fileName = path.basename(fileUri.fsPath);
+                progress.report({
+                    increment: (1 / totalCount) * 100,
+                    message: `Syncing ${fileName} (${currentCount + 1}/${totalCount})`
+                });
+
+                const fileBytes = await vscode.workspace.fs.readFile(fileUri);
+                const fileContent = Buffer.from(fileBytes).toString('utf8');
+
+                // Call backend remember API
+                await fetch(`${BACKEND_URL}/remember`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text_or_file_content: fileContent,
+                        file_path: fileUri.fsPath,
+                        dataset_name: 'main_dataset'
+                    })
+                });
+            } catch (err) {
+                console.error(`Align.ai: Error syncing file ${fileUri.fsPath}:`, err);
+            }
+            
+            currentCount++;
+        }
+
+        // Finalize by recalling guardrails and updating .cursorrules automatically
+        progress.report({ message: 'Finalizing context and updating .cursorrules...' });
+        try {
+            const response = await fetch(`${BACKEND_URL}/recall`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query_prompt: 'general design, layout, spacing rules and code conventions',
+                    dataset_name: 'main_dataset'
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                await updateCursorRules(data.prompt_payload);
+            }
+        } catch (err) {
+            console.error('Align.ai: Final recall failed:', err);
+        }
+
+        if (activeProvider && activeProvider.view) {
+            activeProvider.sendStateUpdate('Synced with Cognee Graph', 'synced');
+            activeProvider.postMessage({
+                command: 'syncResult',
+                message: `Successfully synced entire workspace (${currentCount} files) and updated .cursorrules.`
+            });
+        }
+        vscode.window.showInformationMessage(`Align.ai: Successfully synced entire workspace (${currentCount} files).`);
+    });
 }
 
 async function pruneDatasetMemory() {
@@ -289,6 +413,9 @@ class AlignAiSidebarProvider implements vscode.WebviewViewProvider {
                     break;
                 case 'checkStatus':
                     await this.checkBackendStatus();
+                    break;
+                case 'syncWorkspace':
+                    await syncEntireWorkspace();
                     break;
             }
         });

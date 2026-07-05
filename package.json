@@ -51,6 +51,11 @@
         "command": "align-ai.pruneNodes",
         "title": "Align.ai: Prune Memory Graph",
         "icon": "$(trash)"
+      },
+      {
+        "command": "align-ai.syncWorkspace",
+        "title": "Align.ai: Sync Entire Workspace to Memory",
+        "icon": "$(cloud-upload)"
       }
     ]
   },
