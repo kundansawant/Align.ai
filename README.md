@@ -1,13 +1,13 @@
 # Align.ai — The Full-Stack Context Guardrail for Developers
 
-> Align.ai is a premium VS Code Extension and FastAPI companion server that prevents layout drift and architectural decay. By leveraging **Cognee's hybrid graph-vector memory layer**, Align.ai watches your workspace in real-time, enforcing strict design system standards and backend engineering conventions automatically.
+> Align.ai is a premium VS Code Extension and FastAPI companion server that prevents layout drift and architectural decay. By leveraging **Cognee's hybrid graph vector memory layer**, Align.ai watches your workspace in real-time, enforcing strict design system standards and backend engineering conventions automatically.
 
 ## 🚀 The Problem & The Solution
 
 ### The Problem: Context Drift & Architectural Decay
-In modern, fast-paced software development—especially when collaborating with AI assistants—codebases suffer from **context drift** across frontend and backend.
-* **Architectural & Style Drift**: Code-generation models frequently violate codebase structures, introducing rogue CSS rules, mixing up naming conventions, or breaking backend patterns (like repository layouts, exception structures, and controller boundaries).
-* **Conventions Decay**: Over time, ad-hoc changes dilute codebase standards, making the project harder to maintain and causing team-wide inconsistency.
+In modern, fast-paced software development especially when collaborating with AI assistants codebases suffer from **context drift** across frontend and backend.
+* **Architectural & Style Drift**: Code generation models frequently violate codebase structures, introducing rogue CSS rules, mixing up naming conventions, or breaking backend patterns (like repository layouts, exception structures, and controller boundaries).
+* **Conventions Decay**: Over time, ad-hoc changes dilute codebase standards, making the project harder to maintain and causing team wide inconsistency.
 * **Token/Context Overflow**: Developers copy-paste massive files into prompts, leaking sensitive business logic and causing token bloat.
 
 ### The Solution: Align.ai
