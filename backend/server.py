@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Startup event to initialize Cognee framework
+# Startup event to initialize Cognee framework (test change)
 @app.on_event("startup")
 async def startup_event():
     success = await memory_engine.init_cognee()

@@ -76,6 +76,7 @@ To ensure a **1-click onboarding experience** for evaluators and hackathon judge
 | **Sleek Vercel-Style Sidebar** | Frontend (Webview) | Monochromatic, pitch-black dashboard displaying real-time context status, dynamic active file properties, and guardrail settings. |
 | **Real-Time Sync Hooks** | Watcher (Extension) | Automatically calls `/remember` when TypeScript, CSS, Python, or JSON files are saved to keep the memory graph up to date. |
 | **Dual Guardrail Manager** | Hybrid Spec | Keeps track of both UI/Styling constraints (1280x720 layout, 16px padding) and Engineering logic (Repository pattern, APIException rules). |
+| **Dynamic `.cursorrules` Sync** | Extension | Automatically writes the recalled prompt payload into the workspace's `.cursorrules` file. This feeds the retrieved guardrails directly to any coding AI agent (like Cursor or Antigravity) without manual copy-pasting. |
 | **Simulated License Hub** | SaaS Demo | Generates credentials instantly via a mock script shell to authorize sandbox developer access. |
 
 ---
@@ -156,7 +157,4 @@ To ensure a **1-click onboarding experience** for evaluators and hackathon judge
 
 ---
 
-## 🤖 AI Disclosure Notice
 
-> [!NOTE]
-> This project was developed for the WeMakeDevs hackathon. Auxiliary code generation, styling transitions, and documentation formatting were assisted and optimized using **Antigravity IDE** and LLM-assisted coding subagents.

@@ -154,6 +154,9 @@ async function recallDesignGuardrails(query: string) {
 
         const data = await response.json();
         
+        // Dynamically update workspace .cursorrules
+        await updateCursorRules(data.prompt_payload);
+
         if (activeProvider && activeProvider.view) {
             activeProvider.sendStateUpdate('Synced with Cognee Graph', 'synced');
             activeProvider.postMessage({
@@ -173,6 +176,44 @@ async function recallDesignGuardrails(query: string) {
             });
         }
         vscode.window.showErrorMessage('Align.ai: Failed to recall memory. Ensure backend is running.');
+    }
+}
+
+async function updateCursorRules(payload: string) {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        return;
+    }
+    const rootPath = workspaceFolders[0].uri.fsPath;
+    const cursorRulesPath = path.join(rootPath, '.cursorrules');
+    const cursorRulesUri = vscode.Uri.file(cursorRulesPath);
+    
+    let currentContent = '';
+    try {
+        const fileBytes = await vscode.workspace.fs.readFile(cursorRulesUri);
+        currentContent = Buffer.from(fileBytes).toString('utf8');
+    } catch (err) {
+        // File doesn't exist yet, which is fine
+    }
+
+    const startMarker = '### ALIGN.AI DESIGN GUARDRAILS (AUTO-GENERATED) ###';
+    const endMarker = '### END ALIGN.AI DESIGN GUARDRAILS ###';
+    const newSection = `${startMarker}\n${payload}\n${endMarker}`;
+
+    let newContent = '';
+    if (currentContent.includes(startMarker) && currentContent.includes(endMarker)) {
+        const startIndex = currentContent.indexOf(startMarker);
+        const endIndex = currentContent.indexOf(endMarker) + endMarker.length;
+        newContent = currentContent.slice(0, startIndex) + newSection + currentContent.slice(endIndex);
+    } else {
+        newContent = currentContent ? `${currentContent.trim()}\n\n${newSection}\n` : `${newSection}\n`;
+    }
+
+    try {
+        await vscode.workspace.fs.writeFile(cursorRulesUri, Buffer.from(newContent, 'utf8'));
+        vscode.window.showInformationMessage('Align.ai: Updated workspace .cursorrules file.');
+    } catch (err: any) {
+        console.error('Align.ai failed to write .cursorrules:', err);
     }
 }
 
