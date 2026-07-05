@@ -158,3 +158,5 @@ To ensure a **1-click onboarding experience** for evaluators and hackathon judge
 ---
 
 
+> [!NOTE]
+> This project was developed for the WeMakeDevs hackathon. Auxiliary code generation, styling transitions, and documentation formatting.
